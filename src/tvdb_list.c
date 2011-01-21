@@ -3,56 +3,58 @@
 #include <stdlib.h>
 #include "tvdb_list.h"
 
+/*
+ * For this add method to work, an empty list must be represented by a NULL Pointer.
+ */
 TVDB_API tvdb_list_node_t *tvdb_list_add(tvdb_list_node_t **p, void *data, size_t len) {
-   tvdb_list_node_t *n;
-
-   if (p == 0)
+   tvdb_list_node_t *n=NULL;
+  
+   if (p == NULL){
       return 0;
+   }
 
-   n = (tvdb_list_node_t *)malloc(sizeof(tvdb_list_node_t));
+   n = (tvdb_list_node_t *)calloc(1, sizeof(tvdb_list_node_t));
+   if (n == NULL)
+     return NULL;
 
-   if (n == 0)
-      return 0;
-
-   n->next = *p;
-   *p = n;
+   /*
+    * Initialize the new node
+    */
    n->data = data;
    n->size = len;
+   n->next = *p;
+   *p = n;
 
    return *p;
 }
 
-TVDB_API void tvdb_list_remove(tvdb_list_node_t **p) {
-   if (p != 0 && *p != 0) {
-      tvdb_list_node_t *n = *p;
-      *p = (*p)->next;
-      free(n);
-   }
+TVDB_API void tvdb_list_remove(tvdb_list_node_t *p) {
+  tvdb_list_node_t *n=NULL;
+
+  /*
+   * Move past every element, delete until current element is NULL
+   */
+  while(p != NULL) {
+    n=p->next;
+    free(p->data);
+    free(p);
+    p=n;
+  }
 }
 
-TVDB_API tvdb_list_node_t **tvdb_list_find(tvdb_list_node_t **n, tvdb_list_node_t *data, cmpfn_t compare) {
-   if (n == 0)
+  TVDB_API tvdb_list_node_t **tvdb_list_find(tvdb_list_node_t **n, tvdb_list_node_t *data, cmpfn_t compare) {
+    if (n == 0)
       return 0;
 
-   while (*n != 0) {
+    while (*n != 0) {
       if (compare(data, *n) == 0)
-         return n;
+        return n;
       n = &(*n)->next;
-   }
+    }
 
-   return 0;
-}
-
-TVDB_API tvdb_list_node_t *tvdb_list_new() {
-   tvdb_list_node_t *node;
-   node = (tvdb_list_node_t *)malloc(sizeof(tvdb_list_node_t));
-   node->next = 0;
-   node->data = 0;
-   node->size = 0;
-
-   return node;
-}
+    return 0;
+  }
 
 TVDB_API void tvdb_list_free(tvdb_list_node_t *node) {
-   free(node);
+  free(node);
 }

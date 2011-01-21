@@ -9,11 +9,12 @@ extern "C" {
 #endif
 
 TVDB_API int tvdb_parse_mirrors(const tvdb_buffer_t *xml, const char *url, tvdb_list_node_t **mirrors) {
-   xmlDoc *doc;
-   xmlNode *node, *elem;
-   char *tmp;
-   tvdb_mirror_t *mirror;
-   int result;
+   xmlDoc *doc=NULL;
+   xmlNode *node=NULL;
+   xmlNode *elem=NULL;
+   char *tmp=NULL;
+   tvdb_mirror_t *mirror=NULL;
+   int result=0;
 
    result = TVDB_E_PARSE_MIRRORS_XML;
 
@@ -30,19 +31,19 @@ TVDB_API int tvdb_parse_mirrors(const tvdb_buffer_t *xml, const char *url, tvdb_
             for (elem = node->children; elem; elem = elem->next) {
                if (elem->type == XML_ELEMENT_NODE) {
                   if (!xmlStrcmp(elem->name, (const xmlChar *)"id")) {
-                     if ((tmp = xmlNodeGetContent(elem))) {
+                     if ((tmp = (char*) xmlNodeGetContent(elem))) {
                         mirror->id = atoi(tmp);
                         xmlFree(tmp);
                      }
                   }
                   else if (!xmlStrcmp(elem->name, (const xmlChar *)"mirrorpath")) {
-                     if ((tmp = xmlNodeGetContent(elem))) {
+                     if ((tmp = (char*) xmlNodeGetContent(elem))) {
                         strcpy(mirror->path, tmp);
                         xmlFree(tmp);
                      }
                   }
                   else if (!xmlStrcmp(elem->name, (const xmlChar *)"typemask")) {
-                     if ((tmp = xmlNodeGetContent(elem))) {
+                     if ((tmp = (char*) xmlNodeGetContent(elem))) {
                         mirror->type = atoi(tmp);
                         xmlFree(tmp);
                      }
@@ -57,15 +58,18 @@ TVDB_API int tvdb_parse_mirrors(const tvdb_buffer_t *xml, const char *url, tvdb_
       result = TVDB_OK;
    }
 
+   xmlFreeDoc(doc);
+
    return result;
 }
 
 TVDB_API int tvdb_parse_time(const tvdb_buffer_t *xml, const char *url, tvdb_time_t *server_time) {
-   xmlDoc *doc;
-   xmlNode *node, *elem;
-   char *tmp;
-   int len;
-   int result;
+   xmlDoc *doc=NULL;
+   xmlNode *node=NULL;
+   xmlNode *elem=NULL;
+   char *tmp=NULL;
+   int len=0;
+   int result=0;
 
    result = TVDB_E_PARSE_TIME_XML;
 
@@ -79,8 +83,8 @@ TVDB_API int tvdb_parse_time(const tvdb_buffer_t *xml, const char *url, tvdb_tim
          elem = elem->next;
 
       if (elem && elem->type == XML_ELEMENT_NODE && !xmlStrcmp(elem->name, (const xmlChar *)"Time")) {
-         if ((tmp = xmlNodeGetContent(elem))) {
-            len = xmlStrlen(tmp);
+         if ((tmp = (char*) xmlNodeGetContent(elem))) {
+            len = xmlStrlen(BAD_CAST tmp);
             memcpy(*server_time, tmp, len);
             (*server_time)[len] = 0;
             xmlFree(tmp);
@@ -88,6 +92,8 @@ TVDB_API int tvdb_parse_time(const tvdb_buffer_t *xml, const char *url, tvdb_tim
          }
       }
    }
+
+   xmlFreeDoc(doc);
 
    return result;
 }
@@ -100,6 +106,11 @@ TVDB_API int tvdb_parse_series(const tvdb_buffer_t *xml, const char *url, tvdb_l
    int result;
 
    result = TVDB_E_PARSE_SERIES_XML;
+
+   if(xml == NULL || series == NULL) 
+   {
+     return TVDB_E_PARSE_SERIES_XML;
+   }
 
    doc = xmlReadMemory(xml->memory, xml->size, url, 0, 0);
    node = xmlDocGetRootElement(doc);
@@ -114,55 +125,55 @@ TVDB_API int tvdb_parse_series(const tvdb_buffer_t *xml, const char *url, tvdb_l
             for (elem = node->children; elem; elem = elem->next) {
                if (elem->type == XML_ELEMENT_NODE) {
                   if (!xmlStrcmp(elem->name, (const xmlChar *)"id")) {
-                     if ((tmp = xmlNodeGetContent(elem))) {
+                     if ((tmp = (char*) xmlNodeGetContent(elem))) {
                         s->id = atoi(tmp);
                         xmlFree(tmp);
                      }
                   }
                   else if (!xmlStrcmp(elem->name, (const xmlChar *)"seriesid")) {
-                     if ((tmp = xmlNodeGetContent(elem))) {
+                     if ((tmp = (char*) xmlNodeGetContent(elem))) {
                         s->series_id = atoi(tmp);
                         xmlFree(tmp);
                      }
                   }
                   else if (!xmlStrcmp(elem->name, (const xmlChar *)"language")) {
-                     if ((tmp = xmlNodeGetContent(elem))) {
+                     if ((tmp = (char*) xmlNodeGetContent(elem))) {
                         strcpy(s->lang, tmp);
                         xmlFree(tmp);
                      }
                   }
                   else if (!xmlStrcmp(elem->name, (const xmlChar *)"SeriesName")) {
-                     if ((tmp = xmlNodeGetContent(elem))) {
+                     if ((tmp = (char*) xmlNodeGetContent(elem))) {
                         strcpy(s->name, tmp);
                         xmlFree(tmp);
                      }
                   }
                   else if (!xmlStrcmp(elem->name, (const xmlChar *)"banner")) {
-                     if ((tmp = xmlNodeGetContent(elem))) {
+                     if ((tmp = (char*) xmlNodeGetContent(elem))) {
                         strcpy(s->banner, tmp);
                         xmlFree(tmp);
                      }
                   }
                   else if (!xmlStrcmp(elem->name, (const xmlChar *)"Overview")) {
-                     if ((tmp = xmlNodeGetContent(elem))) {
+                     if ((tmp = (char*) xmlNodeGetContent(elem))) {
                         strcpy(s->overview, tmp);
                         xmlFree(tmp);
                      }
                   }
                   else if (!xmlStrcmp(elem->name, (const xmlChar *)"FirstAired")) {
-                     if ((tmp = xmlNodeGetContent(elem))) {
+                     if ((tmp = (char*) xmlNodeGetContent(elem))) {
                         strcpy(s->first_aired, tmp);
                         xmlFree(tmp);
                      }
                   }
                   else if (!xmlStrcmp(elem->name, (const xmlChar *)"IMDB_ID")) {
-                     if ((tmp = xmlNodeGetContent(elem))) {
+                     if ((tmp = (char*) xmlNodeGetContent(elem))) {
                         strcpy(s->imdb_id, tmp);
                         xmlFree(tmp);
                      }
                   }
                   else if (!xmlStrcmp(elem->name, (const xmlChar *)"zap2it_id")) {
-                     if ((tmp = xmlNodeGetContent(elem))) {
+                     if ((tmp = (char*) xmlNodeGetContent(elem))) {
                         strcpy(s->zap2it_id, tmp);
                         xmlFree(tmp);
                      }
@@ -173,9 +184,10 @@ TVDB_API int tvdb_parse_series(const tvdb_buffer_t *xml, const char *url, tvdb_l
             tvdb_list_add(series, s, sizeof(s));
          }
       }
-
       result = TVDB_OK;
    }
+
+   xmlFreeDoc(doc);
 
    return result;
 }

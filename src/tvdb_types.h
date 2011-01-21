@@ -58,4 +58,10 @@ typedef struct tvdb_series {
  */
 tvdb_series_t *tvdb_alloc_series();
 
+/*
+ * Should be in an generic functions file not types
+ * For now we leave it here.
+ */
+void tvdb_init_buffer(tvdb_buffer_t *buf);
+
 #endif /* TVDB_TYPES_H_INCLUDED */
