@@ -1,6 +1,8 @@
 #ifndef TVDB_TYPES_H_INCLUDED
 #define TVDB_TYPES_H_INCLUDED
 
+#define TVDB_STRING_SIZE 2048
+
 /** \brief tvdb context handle
  */
 typedef long htvdb_t;
@@ -24,7 +26,7 @@ void tvdb_free_buffer(tvdb_buffer_t *);
  */
 typedef struct tvdb_mirror {
    int   id;
-   char  path[1024];
+   char  path[TVDB_STRING_SIZE+1];
    int   type;
 } tvdb_mirror_t;
 
@@ -40,18 +42,19 @@ typedef char tvdb_time_t[16];
  */
 tvdb_time_t *tvdb_alloc_time();
 
+
 /** \brief Data for one series
  */
 typedef struct tvdb_series {
    int   id;
    int   series_id;
-   char  lang[16];
-   char  name[128];
-   char  banner[128];
-   char  overview[2048];
-   char  first_aired[16];
-   char  imdb_id[16];
-   char  zap2it_id[16];
+   char  lang[TVDB_STRING_SIZE+1];
+   char  name[TVDB_STRING_SIZE+1];
+   char  banner[TVDB_STRING_SIZE+1];
+   char  overview[TVDB_STRING_SIZE+1];
+   char  first_aired[TVDB_STRING_SIZE+1];
+   char  imdb_id[TVDB_STRING_SIZE+1];
+   char  zap2it_id[TVDB_STRING_SIZE+1];
 } tvdb_series_t;
 
 /** \brief Allocates a series struct and zeros it

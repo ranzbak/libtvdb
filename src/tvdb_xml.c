@@ -138,47 +138,48 @@ TVDB_API int tvdb_parse_series(const tvdb_buffer_t *xml, const char *url, tvdb_l
                   }
                   else if (!xmlStrcmp(elem->name, (const xmlChar *)"language")) {
                      if ((tmp = (char*) xmlNodeGetContent(elem))) {
-                        strcpy(s->lang, tmp);
+                        strncpy(s->lang, tmp, TVDB_STRING_SIZE);
                         xmlFree(tmp);
                      }
                   }
                   else if (!xmlStrcmp(elem->name, (const xmlChar *)"SeriesName")) {
                      if ((tmp = (char*) xmlNodeGetContent(elem))) {
-                        strcpy(s->name, tmp);
+                        strncpy(s->name, tmp, TVDB_STRING_SIZE);
                         xmlFree(tmp);
                      }
                   }
                   else if (!xmlStrcmp(elem->name, (const xmlChar *)"banner")) {
                      if ((tmp = (char*) xmlNodeGetContent(elem))) {
-                        strcpy(s->banner, tmp);
+                        strncpy(s->banner, tmp, TVDB_STRING_SIZE);
                         xmlFree(tmp);
                      }
                   }
                   else if (!xmlStrcmp(elem->name, (const xmlChar *)"Overview")) {
                      if ((tmp = (char*) xmlNodeGetContent(elem))) {
-                        strcpy(s->overview, tmp);
+                        strncpy(s->overview, tmp, TVDB_STRING_SIZE);
                         xmlFree(tmp);
                      }
                   }
                   else if (!xmlStrcmp(elem->name, (const xmlChar *)"FirstAired")) {
                      if ((tmp = (char*) xmlNodeGetContent(elem))) {
-                        strcpy(s->first_aired, tmp);
+                        strncpy(s->first_aired, tmp, TVDB_STRING_SIZE);
                         xmlFree(tmp);
                      }
                   }
                   else if (!xmlStrcmp(elem->name, (const xmlChar *)"IMDB_ID")) {
                      if ((tmp = (char*) xmlNodeGetContent(elem))) {
-                        strcpy(s->imdb_id, tmp);
+                        strncpy(s->imdb_id, tmp, TVDB_STRING_SIZE);
                         xmlFree(tmp);
                      }
                   }
                   else if (!xmlStrcmp(elem->name, (const xmlChar *)"zap2it_id")) {
                      if ((tmp = (char*) xmlNodeGetContent(elem))) {
-                        strcpy(s->zap2it_id, tmp);
+                        strncpy(s->zap2it_id, tmp, TVDB_STRING_SIZE);
                         xmlFree(tmp);
                      }
                   }
                }
+               tmp=NULL;
             }
 
             tvdb_list_add(series, s, sizeof(s));
