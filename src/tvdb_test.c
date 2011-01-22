@@ -20,9 +20,13 @@ void print_mirrors(const tvdb_list_node_t *mirrors) {
    }
 }
 
-void print_series(const tvdb_list_node_t *series) {
+void print_series(htvdb_t htvdb, const tvdb_list_node_t *series) {
    const tvdb_list_node_t *n=NULL;
    tvdb_series_t *s=NULL;
+   tvdb_buffer_t buf;
+   int rc=0;
+
+   tvdb_init_buffer(&buf);
 
    printf("\nSeries:\n");
 
@@ -30,6 +34,10 @@ void print_series(const tvdb_list_node_t *series) {
    while(n != NULL) {
       s = (tvdb_series_t *)n->data;
       printf("\n  id [%i], seriesid [%i], name [%s], overview: %s\n", s->id, s->series_id, s->name, s->overview);
+      // Get image banner, and as 'proof' we got it, diplay filesize.
+      rc = tvdb_banners(htvdb, "http://www.thetvdb.com/", s->banner, &buf);
+      printf("Banner file size: %ld\n", buf.size);
+      tvdb_free_buffer(&buf);
       n = n->next;
    }
 }
@@ -87,10 +95,10 @@ int main(int argc, char *argv[]) {
   tvdb_free_buffer(&time_xml);
 
   /* Get series XML and parse it */
-  tvdb_series(tvdb, argv[1], &series_xml);
+  tvdb_series(tvdb, argv[1], "en", &series_xml);
   rc = tvdb_parse_series(&series_xml, 0, &series);
   if(rc == TVDB_OK) {
-    print_series(series);
+    print_series(tvdb, series);
     tvdb_free_buffer(&series_xml);
   }
 

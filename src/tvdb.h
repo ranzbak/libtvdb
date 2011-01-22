@@ -11,8 +11,9 @@ TVDB_API htvdb_t tvdb_init(const char* key);
 TVDB_API void tvdb_uninit(htvdb_t htvdb);
 TVDB_API int tvdb_mirrors(htvdb_t htvdb, tvdb_buffer_t *buf);
 TVDB_API int tvdb_time(htvdb_t htvdb, tvdb_buffer_t *buf);
-TVDB_API int tvdb_series(htvdb_t htvdb, const char *name, tvdb_buffer_t *buf);
+TVDB_API int tvdb_series(htvdb_t htvdb, const char *name, const char *language, tvdb_buffer_t *buf);
 TVDB_API int tvdb_series_info(htvdb_t htvdb, const char *mirror, int series_id, const char *lang, tvdb_buffer_t *buf);
+TVDB_API int tvdb_banners(htvdb_t htvdb, const char *mirror, const char *filename, tvdb_buffer_t *buf);
 TVDB_API const char* tvdb_error_text(int err);
 TVDB_API void tvdb_free(void *);
 

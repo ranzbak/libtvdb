@@ -114,7 +114,7 @@ CURLcode get_XML(CURL *curl, const char *url, tvdb_buffer_t *buf) {
    if ((cc = curl_easy_setopt(curl, CURLOPT_WRITEDATA, buf)) != CURLE_OK)
       return cc;
 
-   if ((cc = curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0")) != CURLE_OK)
+   if ((cc = curl_easy_setopt(curl, CURLOPT_USERAGENT, "libtvdb-agent/1.0")) != CURLE_OK)
       return cc;
 
    cc = curl_easy_perform(curl);
@@ -134,7 +134,7 @@ CURLcode get_file(CURL *curl, const char *url, tvdb_buffer_t *file) {
    if ((cc = curl_easy_setopt(curl, CURLOPT_WRITEDATA, file)) != CURLE_OK)
       return cc;
 
-   if ((cc = curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0")) != CURLE_OK)
+   if ((cc = curl_easy_setopt(curl, CURLOPT_USERAGENT, "libtvdb-agent/1.0")) != CURLE_OK)
       return cc;
 
    cc = curl_easy_perform(curl);
@@ -194,7 +194,7 @@ TVDB_API int tvdb_time(htvdb_t htvdb, tvdb_buffer_t *buf) {
    return TVDB_OK;
 }
 
-TVDB_API int tvdb_series(htvdb_t htvdb, const char *name, tvdb_buffer_t *buf) {
+TVDB_API int tvdb_series(htvdb_t htvdb, const char *name, const char *language, tvdb_buffer_t *buf) {
    tvdb_context_t *tvdb=NULL;
    URL url;
    CURLcode cc;
@@ -214,7 +214,7 @@ TVDB_API int tvdb_series(htvdb_t htvdb, const char *name, tvdb_buffer_t *buf) {
     * build query
     */
    urlname = curl_easy_escape(tvdb->curl, name, strlen(name));
-   snprintf(url, URL_SIZE, "http://www.thetvdb.com/api/GetSeries.php?seriesname=%s", urlname);
+   snprintf(url, URL_SIZE, "http://www.thetvdb.com/api/GetSeries.php?seriesname=%s&language=%s", urlname, language);
 
    if ((cc = get_XML(tvdb->curl, url, buf)) == CURLE_OK)
    {
@@ -230,7 +230,6 @@ TVDB_API int tvdb_series_info(htvdb_t htvdb, const char *mirror, int series_id, 
    tvdb_context_t *tvdb;
    URL url;
    CURLcode cc;
-   char *urlname=NULL;
    int result=TVDB_E_CURL;
 
    if (htvdb <= 0)
@@ -247,15 +246,39 @@ TVDB_API int tvdb_series_info(htvdb_t htvdb, const char *mirror, int series_id, 
     * build query
     */
    snprintf(url, URL_SIZE, "%s/api/%s/series/%d/all/%s.xml", mirror, tvdb->key, series_id, lang);
-   // @@DEBUG
-   printf("Series info URL: '%s'.\n", url);
-
    if ((cc = get_file(tvdb->curl, url, buf)) == CURLE_OK)
    {
       result = TVDB_OK;
    }
 
-   curl_free(urlname);
+   return result;
+}
+
+TVDB_API int tvdb_banners(htvdb_t htvdb, const char *mirror, const char *filename, tvdb_buffer_t *buf)
+{
+   URL url;
+   CURLcode cc;
+   int result=TVDB_E_CURL;
+   tvdb_context_t *tvdb;
+
+   if (htvdb <= 0)
+      return TVDB_E_INVALID_HANDLE;
+
+   tvdb = (tvdb_context_t *)htvdb;
+
+   /*
+    * Initialize buffer
+    */
+   tvdb_init_buffer(buf);
+
+   /*
+    * build query
+    */
+   snprintf(url, URL_SIZE, "%s/banners/%s", mirror, filename);
+   if ((cc = get_file(tvdb->curl, url, buf)) == CURLE_OK)
+   {
+      result = TVDB_OK;
+   }
 
    return result;
 }
