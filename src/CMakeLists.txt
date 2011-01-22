@@ -43,6 +43,7 @@ endif (SHARED_LIB)
 add_library(tvdb ${LIB_TYPE} tvdb_types.c tvdb_xml.c tvdb.c tvdb_list.c)
 add_executable(tvdb_test tvdb_test.c)
 add_dependencies(tvdb_test tvdb)
+add_definitions(-Wall -g)
 
 if (MSVC)
    set_target_properties(tvdb PROPERTIES LINK_FLAGS "/MAP")

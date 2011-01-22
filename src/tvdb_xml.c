@@ -38,7 +38,7 @@ TVDB_API int tvdb_parse_mirrors(const tvdb_buffer_t *xml, const char *url, tvdb_
                   }
                   else if (!xmlStrcmp(elem->name, (const xmlChar *)"mirrorpath")) {
                      if ((tmp = (char*) xmlNodeGetContent(elem))) {
-                        strcpy(mirror->path, tmp);
+                        strncpy(mirror->path, tmp, TVDB_STRING_SIZE);
                         xmlFree(tmp);
                      }
                   }
@@ -99,13 +99,13 @@ TVDB_API int tvdb_parse_time(const tvdb_buffer_t *xml, const char *url, tvdb_tim
 }
 
 TVDB_API int tvdb_parse_series(const tvdb_buffer_t *xml, const char *url, tvdb_list_node_t **series) {
-   xmlDoc *doc;
-   xmlNode *node, *elem;
-   char *tmp;
-   tvdb_series_t *s;
-   int result;
+   xmlDoc *doc=NULL;
+   xmlNode *node=NULL;
+   xmlNode *elem=NULL;
+   char *tmp=NULL;
+   tvdb_series_t *s=NULL;
+   int result = TVDB_E_PARSE_SERIES_XML;
 
-   result = TVDB_E_PARSE_SERIES_XML;
 
    if(xml == NULL || series == NULL) 
    {
@@ -182,7 +182,7 @@ TVDB_API int tvdb_parse_series(const tvdb_buffer_t *xml, const char *url, tvdb_l
                tmp=NULL;
             }
 
-            tvdb_list_add(series, s, sizeof(s));
+            tvdb_list_add(series, s, sizeof(tvdb_series_t));
          }
       }
       result = TVDB_OK;
@@ -191,6 +191,142 @@ TVDB_API int tvdb_parse_series(const tvdb_buffer_t *xml, const char *url, tvdb_l
    xmlFreeDoc(doc);
 
    return result;
+}
+
+TVDB_API int tvdb_parse_series_info(const tvdb_buffer_t *xml, const char *url, tvdb_list_node_t **series)
+{
+  xmlDoc *doc=NULL;
+  xmlNode *node=NULL;
+  xmlNode *elem=NULL;
+  char *tmp=NULL;
+  tvdb_series_info_t *s=NULL;
+  int result = TVDB_E_PARSE_SERIES_XML;
+
+  if(xml == NULL || series == NULL) 
+  {
+    return TVDB_E_PARSE_SERIES_XML;
+  }
+
+  doc = xmlReadMemory(xml->memory, xml->size, url, 0, 0);
+  node = xmlDocGetRootElement(doc);
+
+  if (node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar *)"Data")) {
+    /* iterate Series nodes */
+    for (node = node->children; node; node = node->next) {
+      if (node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar *)"Episode")) {
+        s = tvdb_alloc_series_info();
+
+        /* iterate child elements of each Series node 
+        */
+        for (elem = node->children; elem; elem = elem->next) {
+          if (elem->type == XML_ELEMENT_NODE) {
+            if (!xmlStrcmp(elem->name, (const xmlChar *)"id")) {
+              if ((tmp = (char*) xmlNodeGetContent(elem))) {
+                s->id = atoi(tmp);
+                xmlFree(tmp);
+              }
+            }
+            else if (!xmlStrcmp(elem->name, (const xmlChar *)"Director")) {
+              if ((tmp = (char*) xmlNodeGetContent(elem))) {
+                strncpy(s->director, tmp, TVDB_STRING_SIZE);
+                xmlFree(tmp);
+              }
+            }
+            else if (!xmlStrcmp(elem->name, (const xmlChar *)"EpisodeName")) {
+              if ((tmp = (char*) xmlNodeGetContent(elem))) {
+                strncpy(s->episode_name, tmp, TVDB_STRING_SIZE);
+                xmlFree(tmp);
+              }
+            }
+            else if (!xmlStrcmp(elem->name, (const xmlChar *)"EpisodeNumber")) {
+              if ((tmp = (char*) xmlNodeGetContent(elem))) {
+                s->episode_number = atoi(tmp);
+                xmlFree(tmp);
+              }
+            }
+            else if (!xmlStrcmp(elem->name, (const xmlChar *)"FirstAired")) {
+              if ((tmp = (char*) xmlNodeGetContent(elem))) {
+                strncpy(s->first_aired, tmp, TVDB_STRING_SIZE);
+                xmlFree(tmp);
+              }
+            }
+            else if (!xmlStrcmp(elem->name, (const xmlChar *)"GuestStars")) {
+              if ((tmp = (char*) xmlNodeGetContent(elem))) {
+                strncpy(s->guest_stars, tmp, TVDB_STRING_SIZE);
+                xmlFree(tmp);
+              }
+            }
+            else if (!xmlStrcmp(elem->name, (const xmlChar *)"IMDB_ID")) {
+              if ((tmp = (char*) xmlNodeGetContent(elem))) {
+                strncpy(s->imdb_id, tmp, TVDB_STRING_SIZE);
+                xmlFree(tmp);
+              }
+            }
+            else if (!xmlStrcmp(elem->name, (const xmlChar *)"Language")) {
+              if ((tmp = (char*) xmlNodeGetContent(elem))) {
+                strncpy(s->language, tmp, TVDB_STRING_SIZE);
+                xmlFree(tmp);
+              }
+            }
+            else if (!xmlStrcmp(elem->name, (const xmlChar *)"Overview")) {
+              if ((tmp = (char*) xmlNodeGetContent(elem))) {
+                strncpy(s->overview, tmp, TVDB_STRING_SIZE);
+                xmlFree(tmp);
+              }
+            }
+            else if (!xmlStrcmp(elem->name, (const xmlChar *)"Rating")) {
+              if ((tmp = (char*) xmlNodeGetContent(elem))) {
+                s->rating = atof(tmp);
+                xmlFree(tmp);
+              }
+            }
+            else if (!xmlStrcmp(elem->name, (const xmlChar *)"RatingCount")) {
+              if ((tmp = (char*) xmlNodeGetContent(elem))) {
+                s->rating_count = atoi(tmp);
+                xmlFree(tmp);
+              }
+            }
+            else if (!xmlStrcmp(elem->name, (const xmlChar *)"SeasonNumber")) {
+              if ((tmp = (char*) xmlNodeGetContent(elem))) {
+                s->season_number = atoi(tmp);
+                xmlFree(tmp);
+              }
+            }
+            else if (!xmlStrcmp(elem->name, (const xmlChar *)"Writer")) {
+              if ((tmp = (char*) xmlNodeGetContent(elem))) {
+                strncpy(s->writer, tmp, TVDB_STRING_SIZE);
+                xmlFree(tmp);
+              }
+            }
+            else if (!xmlStrcmp(elem->name, (const xmlChar *)"filename")) {
+              if ((tmp = (char*) xmlNodeGetContent(elem))) {
+                strncpy(s->filename, tmp, TVDB_STRING_SIZE);
+                xmlFree(tmp);
+              }
+            }
+            else if (!xmlStrcmp(elem->name, (const xmlChar *)"seasonid")) {
+              if ((tmp = (char*) xmlNodeGetContent(elem))) {
+                s->season_id = atoi(tmp);
+                xmlFree(tmp);
+              }
+            }
+            else if (!xmlStrcmp(elem->name, (const xmlChar *)"seriesid")) {
+              if ((tmp = (char*) xmlNodeGetContent(elem))) {
+                s->series_id = atoi(tmp);
+                xmlFree(tmp);
+              }
+            }
+          }
+        }
+        tvdb_list_add(series, s, sizeof(tvdb_series_info_t));
+      }
+    }
+    result = TVDB_OK;
+  }
+
+  xmlFreeDoc(doc);
+
+  return result;
 }
 
 #ifdef __cplusplus

@@ -226,7 +226,7 @@ TVDB_API int tvdb_series(htvdb_t htvdb, const char *name, tvdb_buffer_t *buf) {
    return result;
 }
 
-TVDB_API int tvdb_series_info(htvdb_t htvdb, const char *mirror, char *name, const char *lang, tvdb_buffer_t *buf) {
+TVDB_API int tvdb_series_info(htvdb_t htvdb, const char *mirror, int series_id, const char *lang, tvdb_buffer_t *buf) {
    tvdb_context_t *tvdb;
    URL url;
    CURLcode cc;
@@ -239,10 +239,16 @@ TVDB_API int tvdb_series_info(htvdb_t htvdb, const char *mirror, char *name, con
    tvdb = (tvdb_context_t *)htvdb;
 
    /*
+    * Initialize buffer
+    */
+   tvdb_init_buffer(buf);
+
+   /*
     * build query
     */
-   urlname = curl_easy_escape(tvdb->curl, name, strlen(url));
-   snprintf(url, URL_SIZE, "%s/api/GetSeries.php?seriesname=%s&language=%s", mirror, urlname, lang);
+   snprintf(url, URL_SIZE, "%s/api/%s/series/%d/all/%s.xml", mirror, tvdb->key, series_id, lang);
+   // @@DEBUG
+   printf("Series info URL: '%s'.\n", url);
 
    if ((cc = get_file(tvdb->curl, url, buf)) == CURLE_OK)
    {

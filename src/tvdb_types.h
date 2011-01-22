@@ -61,6 +61,32 @@ typedef struct tvdb_series {
  */
 tvdb_series_t *tvdb_alloc_series();
 
+/** \brief Data for one series information
+ */
+typedef struct tvdb_series_info {
+  int   id;
+  char  director[TVDB_STRING_SIZE+1];
+  char  episode_name[TVDB_STRING_SIZE+1];
+  int   episode_number;
+  char  first_aired[TVDB_STRING_SIZE+1];
+  char  guest_stars[TVDB_STRING_SIZE+1];
+  char  imdb_id[TVDB_STRING_SIZE+1];
+  char  language[TVDB_STRING_SIZE+1];
+  char  overview[TVDB_STRING_SIZE+1];
+  float rating;
+  int   rating_count;
+  int   season_number;
+  char  writer[TVDB_STRING_SIZE+1];
+  char  filename[TVDB_STRING_SIZE+1];
+  int   season_id;
+  int   series_id;
+} tvdb_series_info_t;
+
+
+/** \brief Allocates a series info struct and zeros it
+ */
+tvdb_series_info_t *tvdb_alloc_series_info();
+
 /*
  * Should be in an generic functions file not types
  * For now we leave it here.
