@@ -103,13 +103,15 @@ int main(int argc, char *argv[]) {
   }
 
   /* Get series info XML of the first found serie and parse it */
-  m = (tvdb_mirror_t *)mirrors->data;
-  s = (tvdb_series_t *)series->data;
-  tvdb_series_info(tvdb, m->path, s->series_id, "en", &series_info_xml);
-  rc = tvdb_parse_series_info(&series_info_xml, 0, &series_info);
-  if(rc == TVDB_OK) {
-    print_series_info(series_info);
-    tvdb_free_buffer(&series_info_xml);
+  if( mirrors != NULL && series != NULL) {
+    m = (tvdb_mirror_t *)mirrors->data;
+    s = (tvdb_series_t *)series->data;
+    tvdb_series_info(tvdb, m->path, s->series_id, "en", &series_info_xml);
+    rc = tvdb_parse_series_info(&series_info_xml, 0, &series_info);
+    if(rc == TVDB_OK) {
+      print_series_info(series_info);
+      tvdb_free_buffer(&series_info_xml);
+    }
   }
 
   /* Clean up */

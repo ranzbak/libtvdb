@@ -21,7 +21,7 @@ TVDB_API int tvdb_parse_mirrors(const tvdb_buffer_t *xml, const char *url, tvdb_
    doc = xmlReadMemory(xml->memory, xml->size, url, 0, 0);
    node = xmlDocGetRootElement(doc);
 
-   if (node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar *)"Mirrors")) {
+   if (node != NULL && node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar *)"Mirrors")) {
       /* iterate Mirror nodes */
       for (node = node->children; node; node = node->next) {
          if (node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar *)"Mirror")) {
@@ -76,7 +76,7 @@ TVDB_API int tvdb_parse_time(const tvdb_buffer_t *xml, const char *url, tvdb_tim
    doc = xmlReadMemory(xml->memory, xml->size, url, 0, 0);
    node = xmlDocGetRootElement(doc);
 
-   if (node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar *)"Items")) {
+   if (node != NULL && node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar *)"Items")) {
       elem = node->children;
 
       while (elem && elem->type != XML_ELEMENT_NODE)
@@ -115,7 +115,7 @@ TVDB_API int tvdb_parse_series(const tvdb_buffer_t *xml, const char *url, tvdb_l
    doc = xmlReadMemory(xml->memory, xml->size, url, 0, 0);
    node = xmlDocGetRootElement(doc);
 
-   if (node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar *)"Data")) {
+   if (node != NULL && node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar *)"Data")) {
       /* iterate Series nodes */
       for (node = node->children; node; node = node->next) {
          if (node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar *)"Series")) {
@@ -210,7 +210,7 @@ TVDB_API int tvdb_parse_series_info(const tvdb_buffer_t *xml, const char *url, t
   doc = xmlReadMemory(xml->memory, xml->size, url, 0, 0);
   node = xmlDocGetRootElement(doc);
 
-  if (node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar *)"Data")) {
+  if (node != NULL && node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar *)"Data")) {
     /* iterate Series nodes */
     for (node = node->children; node; node = node->next) {
       if (node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar *)"Episode")) {
