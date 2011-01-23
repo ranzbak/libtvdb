@@ -79,6 +79,9 @@ int main(int argc, char *argv[]) {
   tvdb_list_node_t *series_info=NULL;
   tvdb_buffer_t series_info_xml;
 
+  float rating=0.0;
+  tvdb_buffer_t series_rating_xml;
+
   /* Init libtvdb and get a handle */
   htvdb_t tvdb = tvdb_init(MY_API_KEY);
 
@@ -112,6 +115,15 @@ int main(int argc, char *argv[]) {
       print_series_info(series_info);
       tvdb_free_buffer(&series_info_xml);
     }
+  }
+
+  /* Rate a series and get the new rating including ours back */
+  rc = tvdb_rate(tvdb, "http://www.thetvdb.com/", tvdb_type_series, 1983237, 7, &series_rating_xml);
+  if(rc == TVDB_OK) {
+    tvdb_parse_rating(&series_rating_xml, NULL, &rating);
+    printf("XML:\n%s\n", series_rating_xml.memory);
+    printf("Series rating after vote [%.2f].\n", rating);
+    tvdb_free_buffer(&series_rating_xml);
   }
 
   /* Clean up */

@@ -283,12 +283,59 @@ TVDB_API int tvdb_banners(htvdb_t htvdb, const char *mirror, const char *filenam
    return result;
 }
 
+static char *tvdb_get_item_type(tvdb_item_type type)
+{
+  char *itemtype=NULL;
+
+  switch(type) {
+    case tvdb_type_series:
+      itemtype="series";
+      break;
+    case tvdb_type_episode:
+      itemtype="episode";
+      break;
+  }
+
+  return itemtype;
+}
+
+TVDB_API int tvdb_rate(htvdb_t htvdb, const char *mirror, tvdb_item_type type, int item_id, int rating, tvdb_buffer_t *buf)
+{
+  URL url;
+  CURLcode cc=0;
+  int result=TVDB_E_CURL;
+  char *itemtype=NULL;
+  tvdb_context_t *tvdb=NULL;
+
+  if (htvdb <= 0)
+    return TVDB_E_INVALID_HANDLE;
+
+  if (rating < 0 || rating > 10) 
+    return TVDB_E_ERROR;
+
+  tvdb = (tvdb_context_t *)htvdb;
+
+  itemtype = tvdb_get_item_type(type);
+  if(itemtype == NULL)
+    return TVDB_E_ERROR;
+
+  tvdb_init_buffer(buf);
+
+  snprintf(url, URL_SIZE, "%s/api/User_Rating.php?accountid=%s&itemtype=%s&itemid=%d&rating=%d", mirror, tvdb->key, itemtype, item_id, rating  );
+  if ((cc = get_file(tvdb->curl, url, buf)) == CURLE_OK)
+  {
+    result = TVDB_OK;
+  }
+
+  return result;
+}
+
 TVDB_API const char* tvdb_error_text(int err) {
-   switch (err) {
-      case TVDB_E_ERROR:
-         return "TVDB_E_ERROR";
-      case TVDB_E_MEMORY:
-         return "TVDB_E_MEMORY";
+  switch (err) {
+    case TVDB_E_ERROR:
+      return "TVDB_E_ERROR";
+    case TVDB_E_MEMORY:
+      return "TVDB_E_MEMORY";
       case TVDB_E_INVALID_HANDLE:
          return "TVDB_E_INVALID_HANDLE";
       case TVDB_E_INVALID_KEY:

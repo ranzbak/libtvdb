@@ -204,7 +204,7 @@ TVDB_API int tvdb_parse_series_info(const tvdb_buffer_t *xml, const char *url, t
 
   if(xml == NULL || series == NULL) 
   {
-    return TVDB_E_PARSE_SERIES_XML;
+    return TVDB_E_PARSE_SERIES_INFO_XML;
   }
 
   doc = xmlReadMemory(xml->memory, xml->size, url, 0, 0);
@@ -324,6 +324,47 @@ TVDB_API int tvdb_parse_series_info(const tvdb_buffer_t *xml, const char *url, t
     result = TVDB_OK;
   }
 
+  xmlFreeDoc(doc);
+
+  return result;
+}
+
+TVDB_API int tvdb_parse_rating(const tvdb_buffer_t *xml, const char *url, float *rating)
+{
+  xmlDoc *doc=NULL;
+  xmlNode *node=NULL;
+  xmlNode *elem=NULL;
+  xmlNode *data=NULL;
+  int result = TVDB_E_PARSE_RATING_XML;
+  char *tmp=NULL;
+
+  if(xml == NULL)
+  {
+    return TVDB_E_PARSE_RATING_XML;
+  }
+
+  *rating = 0.0;
+
+  doc = xmlReadMemory(xml->memory, xml->size, url, 0, 0);
+  node = xmlDocGetRootElement(doc);
+
+  if (node != NULL && node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar *)"Data")) {
+    for (elem = node->children; elem; elem = elem->next) {
+      if (elem->type == XML_ELEMENT_NODE && !xmlStrcmp(elem->name, (const xmlChar *)"Series")) {
+        for (data = elem->children; data; data = data->next) {
+          if (!xmlStrcmp(data->name, (const xmlChar *)"Rating")) {
+            if ((tmp = (char*) xmlNodeGetContent(data))) {
+              *rating = atof(tmp);
+              xmlFree(tmp);
+              if(*rating != 0.0) {
+                result = TVDB_OK;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
   xmlFreeDoc(doc);
 
   return result;
