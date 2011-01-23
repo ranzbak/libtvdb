@@ -35,7 +35,7 @@ void print_series(htvdb_t htvdb, const tvdb_list_node_t *series) {
       s = (tvdb_series_t *)n->data;
       printf("\n  id [%i], seriesid [%i], name [%s], overview: %s\n", s->id, s->series_id, s->name, s->overview);
       // Get image banner, and as 'proof' we got it, diplay filesize.
-      rc = tvdb_banners(htvdb, "http://www.thetvdb.com/", s->banner, &buf);
+      rc = tvdb_banners(htvdb, s->banner, &buf);
       printf("Banner file size: %ld\n", buf.size);
       tvdb_free_buffer(&buf);
       n = n->next;
@@ -67,7 +67,6 @@ int main(int argc, char *argv[]) {
 
   tvdb_list_node_t *mirrors=NULL;
   tvdb_buffer_t mirrors_xml;
-  tvdb_mirror_t *m=NULL;
 
   tvdb_time_t time;
   tvdb_buffer_t time_xml;
@@ -107,9 +106,8 @@ int main(int argc, char *argv[]) {
 
   /* Get series info XML of the first found serie and parse it */
   if( mirrors != NULL && series != NULL) {
-    m = (tvdb_mirror_t *)mirrors->data;
     s = (tvdb_series_t *)series->data;
-    tvdb_series_info(tvdb, m->path, s->series_id, "en", &series_info_xml);
+    tvdb_series_info(tvdb, s->series_id, "en", &series_info_xml);
     rc = tvdb_parse_series_info(&series_info_xml, 0, &series_info);
     if(rc == TVDB_OK) {
       print_series_info(series_info);
@@ -118,7 +116,7 @@ int main(int argc, char *argv[]) {
   }
 
   /* Rate a series and get the new rating including ours back */
-  rc = tvdb_rate(tvdb, "http://www.thetvdb.com/", tvdb_type_series, 1983237, 7, &series_rating_xml);
+  rc = tvdb_rate(tvdb, tvdb_type_series, 1983237, 7, &series_rating_xml);
   if(rc == TVDB_OK) {
     tvdb_parse_rating(&series_rating_xml, NULL, &rating);
     printf("XML:\n%s\n", series_rating_xml.memory);

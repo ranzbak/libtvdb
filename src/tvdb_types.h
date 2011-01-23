@@ -3,6 +3,17 @@
 
 #define TVDB_STRING_SIZE 2048
 
+#include <curl/curl.h>
+
+/** \brief Holds tvdb context
+ */
+typedef struct tvdb_context {
+   char key[17];
+   CURLcode curl_global;
+   CURL *curl;
+   char *mirror;
+} tvdb_context_t;
+
 /** \brief tvdb context handle
  */
 typedef long htvdb_t;

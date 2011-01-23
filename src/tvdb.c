@@ -10,14 +10,29 @@
 
 #define member_size(type, member) sizeof(((type *)0)->member)
 
-typedef struct tvdb_context {
-   char key[17];
-   CURLcode curl_global;
-   CURL *curl;
-} tvdb_context_t;
-
 #define URL_SIZE 1024
 typedef char URL[URL_SIZE+1];
+
+static char *select_mirror(tvdb_context_t *tvdb)
+{
+  tvdb_list_node_t *mirrors=NULL;
+  tvdb_buffer_t mirrors_xml;
+  char *mirror=NULL;
+  tvdb_mirror_t *m=NULL;
+
+  tvdb_mirrors((htvdb_t) tvdb, &mirrors_xml);
+  tvdb_parse_mirrors(&mirrors_xml, 0, &mirrors);
+
+  // @@TODO Create real random retrieval
+  m = (tvdb_mirror_t *)mirrors->data;
+  mirror = strdup(m->path);
+  
+
+  tvdb_free_buffer(&mirrors_xml);
+  tvdb_list_remove(mirrors);
+
+  return mirror;
+}
 
 TVDB_API htvdb_t tvdb_init(const char* key) {
    tvdb_context_t *tvdb=NULL;
@@ -31,7 +46,7 @@ TVDB_API htvdb_t tvdb_init(const char* key) {
    if (key_len > member_size(tvdb_context_t, key) - 1)
       return TVDB_E_INVALID_KEY;
 
-   tvdb = (tvdb_context_t *)malloc(sizeof(tvdb_context_t));
+   tvdb = (tvdb_context_t *)calloc(1, sizeof(tvdb_context_t));
    
    if (!tvdb)
       return TVDB_E_MEMORY;
@@ -49,6 +64,9 @@ TVDB_API htvdb_t tvdb_init(const char* key) {
       free(tvdb);
       return TVDB_E_CURL_EASY_INIT;
    }
+
+   // Get random mirror
+   tvdb->mirror = select_mirror(tvdb);
 
    return (htvdb_t)tvdb;
 }
@@ -226,7 +244,7 @@ TVDB_API int tvdb_series(htvdb_t htvdb, const char *name, const char *language, 
    return result;
 }
 
-TVDB_API int tvdb_series_info(htvdb_t htvdb, const char *mirror, int series_id, const char *lang, tvdb_buffer_t *buf) {
+TVDB_API int tvdb_series_info(htvdb_t htvdb, int series_id, const char *lang, tvdb_buffer_t *buf) {
    tvdb_context_t *tvdb;
    URL url;
    CURLcode cc;
@@ -245,7 +263,7 @@ TVDB_API int tvdb_series_info(htvdb_t htvdb, const char *mirror, int series_id, 
    /*
     * build query
     */
-   snprintf(url, URL_SIZE, "%s/api/%s/series/%d/all/%s.xml", mirror, tvdb->key, series_id, lang);
+   snprintf(url, URL_SIZE, "%s/api/%s/series/%d/all/%s.xml", tvdb->mirror, tvdb->key, series_id, lang);
    if ((cc = get_file(tvdb->curl, url, buf)) == CURLE_OK)
    {
       result = TVDB_OK;
@@ -254,7 +272,7 @@ TVDB_API int tvdb_series_info(htvdb_t htvdb, const char *mirror, int series_id, 
    return result;
 }
 
-TVDB_API int tvdb_banners(htvdb_t htvdb, const char *mirror, const char *filename, tvdb_buffer_t *buf)
+TVDB_API int tvdb_banners(htvdb_t htvdb, const char *filename, tvdb_buffer_t *buf)
 {
    URL url;
    CURLcode cc;
@@ -274,7 +292,7 @@ TVDB_API int tvdb_banners(htvdb_t htvdb, const char *mirror, const char *filenam
    /*
     * build query
     */
-   snprintf(url, URL_SIZE, "%s/banners/%s", mirror, filename);
+   snprintf(url, URL_SIZE, "%s/banners/%s", tvdb->mirror, filename);
    if ((cc = get_file(tvdb->curl, url, buf)) == CURLE_OK)
    {
       result = TVDB_OK;
@@ -299,7 +317,7 @@ static char *tvdb_get_item_type(tvdb_item_type type)
   return itemtype;
 }
 
-TVDB_API int tvdb_rate(htvdb_t htvdb, const char *mirror, tvdb_item_type type, int item_id, int rating, tvdb_buffer_t *buf)
+TVDB_API int tvdb_rate(htvdb_t htvdb, tvdb_item_type type, int item_id, int rating, tvdb_buffer_t *buf)
 {
   URL url;
   CURLcode cc=0;
@@ -321,7 +339,7 @@ TVDB_API int tvdb_rate(htvdb_t htvdb, const char *mirror, tvdb_item_type type, i
 
   tvdb_init_buffer(buf);
 
-  snprintf(url, URL_SIZE, "%s/api/User_Rating.php?accountid=%s&itemtype=%s&itemid=%d&rating=%d", mirror, tvdb->key, itemtype, item_id, rating  );
+  snprintf(url, URL_SIZE, "%s/api/User_Rating.php?accountid=%s&itemtype=%s&itemid=%d&rating=%d", tvdb->mirror, tvdb->key, itemtype, item_id, rating  );
   if ((cc = get_file(tvdb->curl, url, buf)) == CURLE_OK)
   {
     result = TVDB_OK;
