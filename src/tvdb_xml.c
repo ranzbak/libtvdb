@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-TVDB_API int tvdb_parse_mirrors(const tvdb_buffer_t *xml, const char *url, tvdb_list_node_t **mirrors) {
+TVDB_API int tvdb_parse_mirrors(const tvdb_buffer_t *xml, const char *url, tvdb_list_front_t *mirrors) {
    xmlDoc *doc=NULL;
    xmlNode *node=NULL;
    xmlNode *elem=NULL;
@@ -98,7 +98,7 @@ TVDB_API int tvdb_parse_time(const tvdb_buffer_t *xml, const char *url, tvdb_tim
    return result;
 }
 
-TVDB_API int tvdb_parse_series(const tvdb_buffer_t *xml, const char *url, tvdb_list_node_t **series) {
+TVDB_API int tvdb_parse_series(const tvdb_buffer_t *xml, const char *url, tvdb_list_front_t *series) {
    xmlDoc *doc=NULL;
    xmlNode *node=NULL;
    xmlNode *elem=NULL;
@@ -193,7 +193,7 @@ TVDB_API int tvdb_parse_series(const tvdb_buffer_t *xml, const char *url, tvdb_l
    return result;
 }
 
-TVDB_API int tvdb_parse_series_info(const tvdb_buffer_t *xml, const char *url, tvdb_list_node_t **series)
+TVDB_API int tvdb_parse_series_info(const tvdb_buffer_t *xml, const char *url, tvdb_list_front_t *series)
 {
   xmlDoc *doc=NULL;
   xmlNode *node=NULL;

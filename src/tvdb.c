@@ -8,6 +8,8 @@
 #include "tvdb.h"
 #include "tvdb_xml.h"
 
+#define tvdb_default_mirror "http://www.thetvdb.com"
+
 #define member_size(type, member) sizeof(((type *)0)->member)
 
 #define URL_SIZE 1024
@@ -15,21 +17,30 @@ typedef char URL[URL_SIZE+1];
 
 static char *select_mirror(tvdb_context_t *tvdb)
 {
-  tvdb_list_node_t *mirrors=NULL;
+  tvdb_list_front_t mirrors;
   tvdb_buffer_t mirrors_xml;
   char *mirror=NULL;
   tvdb_mirror_t *m=NULL;
+  char *def=NULL;
+  
+  tvdb_list_init(&mirrors);
 
   tvdb_mirrors((htvdb_t) tvdb, &mirrors_xml);
   tvdb_parse_mirrors(&mirrors_xml, 0, &mirrors);
 
+  /* When no mirror is found (no API_KEY) use default. */
+  if(tvdb_list_size(&mirrors) == 0) 
+  {
+    def=strdup(tvdb_default_mirror);
+    return def;
+  }
+
   // @@TODO Create real random retrieval
-  m = (tvdb_mirror_t *)mirrors->data;
+  m = (tvdb_mirror_t*) tvdb_list_random(&mirrors)->data;
   mirror = strdup(m->path);
   
-
   tvdb_free_buffer(&mirrors_xml);
-  tvdb_list_remove(mirrors);
+  tvdb_list_remove(&mirrors);
 
   return mirror;
 }
@@ -77,6 +88,8 @@ TVDB_API void tvdb_uninit(htvdb_t htvdb) {
    if (htvdb) {
       tvdb = (tvdb_context_t *)htvdb;
 
+      free(tvdb->mirror);
+
       if (tvdb->curl)
          curl_easy_cleanup(tvdb->curl);
 
@@ -85,6 +98,7 @@ TVDB_API void tvdb_uninit(htvdb_t htvdb) {
 
       xmlCleanupParser();
 
+      
       free(tvdb);
    }
 }
