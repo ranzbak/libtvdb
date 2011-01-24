@@ -1,6 +1,7 @@
 #ifndef TVDB_RESULTS_H_INCLUDED
 #define TVDB_RESULTS_H_INCLUDED
 
+#if 0
 #define TVDB_OK                        1
 #define TVDB_E_ERROR                  -1
 #define TVDB_E_MEMORY                 -2
@@ -14,5 +15,6 @@
 #define TVDB_E_PARSE_SERIES_XML       -202
 #define TVDB_E_PARSE_SERIES_INFO_XML  -203
 #define TVDB_E_PARSE_RATING_XML       -204
+#endif
 
 #endif /* TVDB_RESULTS_H_INCLUDED */

@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include "tvdb.h"
 #include "tvdb_types.h"
 
 tvdb_mirror_t *tvdb_alloc_mirror() {

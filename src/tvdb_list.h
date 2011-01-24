@@ -4,22 +4,7 @@
 #include <string.h>
 #include "tvdb_exports.h"
 
-typedef struct tvdb_list_node {
-   struct tvdb_list_node *next;
-   struct tvdb_list_node *prev;
-   void *data;
-   size_t size;
-} tvdb_list_node_t;
-
-typedef struct tvdb_list_front {
-   struct tvdb_list_node *head;
-   struct tvdb_list_node *tail;
-   struct tvdb_list_node *current;
-   unsigned int count;
-} tvdb_list_front_t;
-
 typedef int (*cmpfn_t)(tvdb_list_node_t *a, tvdb_list_node_t *b);
-
 
 TVDB_API tvdb_list_front_t *tvdb_list_add(tvdb_list_front_t *p, void *data, size_t len);
 TVDB_API void tvdb_list_init(tvdb_list_front_t *p);

@@ -4,8 +4,8 @@
 #include <string.h>
 #include <curl/curl.h>
 #include <libxml/parser.h>
-#include "tvdb_types.h"
 #include "tvdb.h"
+#include "tvdb_types.h"
 #include "tvdb_xml.h"
 
 #define tvdb_default_mirror "http://www.thetvdb.com"

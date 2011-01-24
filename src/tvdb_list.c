@@ -1,6 +1,7 @@
 #define libtvdb_EXPORTS
 
 #include <stdlib.h>
+#include "tvdb.h"
 #include "tvdb_list.h"
 
 TVDB_API tvdb_list_front_t *tvdb_list_add(tvdb_list_front_t *p, void *data, size_t len) 

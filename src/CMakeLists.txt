@@ -60,3 +60,12 @@ target_link_libraries(tvdb_test tvdb)
 
 #copy default config file
 #file(COPY "pcproxd.cfg" DESTINATION .)
+
+# Installation of the library
+INSTALL(TARGETS tvdb
+		DESTINATION lib
+		PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
+
+INSTALL(FILES tvdb.h
+		DESTINATION include
+		PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)

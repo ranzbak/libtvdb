@@ -1,7 +1,6 @@
 #ifndef TVDB_TYPES_H_INCLUDED
 #define TVDB_TYPES_H_INCLUDED
 
-#define TVDB_STRING_SIZE 2048
 
 #include <curl/curl.h>
 
@@ -16,14 +15,8 @@ typedef struct tvdb_context {
 
 /** \brief tvdb context handle
  */
-typedef long htvdb_t;
+//typedef long htvdb_t;
 
-/** \brief Holds data received from TVDB
- */
-typedef struct tvdb_buffer {
-   char *memory;
-   size_t size;
-} tvdb_buffer_t;
 
 /** \brief Allocates a buffer with default size
  */
@@ -32,7 +25,7 @@ tvdb_buffer_t *tvdb_alloc_buffer();
 /** \brief Frees a buffer and any memory it has reserved
  */
 void tvdb_free_buffer(tvdb_buffer_t *);
-
+#if 0
 /** \brief Data for one mirror
  */
 typedef struct tvdb_mirror {
@@ -40,20 +33,17 @@ typedef struct tvdb_mirror {
    char  path[TVDB_STRING_SIZE+1];
    int   type;
 } tvdb_mirror_t;
+#endif
 
 /** \brief Allocates a mirror struct and zeros it
  */
 tvdb_mirror_t *tvdb_alloc_mirror();
 
-/** \brief Time from the TVDB server
- */
-typedef char tvdb_time_t[16];
-
 /** \brief Allocates a tvdb_time_t struct and zeros it
  */
 tvdb_time_t *tvdb_alloc_time();
 
-
+#if 0
 /** \brief Data for one series
  */
 typedef struct tvdb_series {
@@ -67,11 +57,13 @@ typedef struct tvdb_series {
    char  imdb_id[TVDB_STRING_SIZE+1];
    char  zap2it_id[TVDB_STRING_SIZE+1];
 } tvdb_series_t;
+#endif
 
 /** \brief Allocates a series struct and zeros it
  */
 tvdb_series_t *tvdb_alloc_series();
 
+#if 0
 /** \brief Data for one series information
  */
 typedef struct tvdb_series_info {
@@ -92,6 +84,7 @@ typedef struct tvdb_series_info {
   int   season_id;
   int   series_id;
 } tvdb_series_info_t;
+#endif
 
 
 /** \brief Allocates a series info struct and zeros it

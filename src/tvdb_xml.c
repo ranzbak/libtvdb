@@ -1,4 +1,5 @@
 #include <libxml/parser.h>
+#include "tvdb.h"
 #include "tvdb_types.h"
 #include "tvdb_xml.h"
 #include "tvdb_results.h"
