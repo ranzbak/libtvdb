@@ -27,3 +27,7 @@ cmake -DSHARED_LIB:BOOL=ON ..
 
     - Edit INCLUDE and LIB environment variables to include the libCURL and libxml2 paths.  Eventually libxml2 will be optional but for now it's required.
     
+
+My branch breaks compatibility with Windows as far as I know, since I don't have a Windows machine to test on.
+Please look at the commits for the main branch to get the Windows compatible source.
+I did the development and testing of this branch on Ubuntu 64 bit.

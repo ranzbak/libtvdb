@@ -4,7 +4,7 @@
 #include "tvdb.h"
 
 /* Change <MY_API_KEY> to the key provided to you by TVDB.com */
-#define MY_API_KEY "8C0846801AB418E3"
+#define MY_API_KEY "<MY_API_KEY>"
 
 void print_mirrors(tvdb_list_front_t *mirrors) {
    tvdb_list_node_t *n=NULL;
