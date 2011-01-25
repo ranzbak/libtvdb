@@ -7,7 +7,7 @@
 typedef int (*cmpfn_t)(tvdb_list_node_t *a, tvdb_list_node_t *b);
 
 TVDB_API tvdb_list_front_t *tvdb_list_add(tvdb_list_front_t *p, void *data, size_t len);
-TVDB_API void tvdb_list_init(tvdb_list_front_t *p);
+TVDB_API void tvdb_list_init(tvdb_list_front_t *front);
 TVDB_API void tvdb_list_remove(tvdb_list_front_t *front);
 TVDB_API unsigned int tvdb_list_size(tvdb_list_front_t *front);
 TVDB_API tvdb_list_node_t *tvdb_list_random(tvdb_list_front_t *front);

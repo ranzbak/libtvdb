@@ -80,39 +80,230 @@ typedef struct tvdb_list_front {
 } tvdb_list_front_t;
 
 typedef char tvdb_time_t[16];
+
 typedef enum tvdb_item_type_e{tvdb_type_series, tvdb_type_episode}  tvdb_item_type;
 
-/* TVDB generic functions */
+/* 
+ * Initializes the XML download buffer.
+ * @arguments
+ * buf pointer to XML buffer to be initialized
+ */
 void tvdb_init_buffer(tvdb_buffer_t *buf);
-void tvdb_free_buffer(tvdb_buffer_t *);
+
+/*
+ * Free the XML buffer
+ * @arguments
+ * buf Buffer to be freed
+ */
+void tvdb_free_buffer(tvdb_buffer_t *buf);
 
 /* TVDB functions */
 
+/*
+ * Initialize libtvdb 
+ * @arguments
+ * key API key, to get from thetvdb.com
+ * @return
+ * tvdb new tvdb handle.
+ */
 htvdb_t tvdb_init(const char* key);
+
+/*
+ * Uninitialize the tvdb handle
+ * @arguments
+ * htvdb handle to uninitialize
+ */
 void tvdb_uninit(htvdb_t htvdb);
+
+/*
+ * Get XML data, describing mirrors
+ * @arguments
+ * htvdb tvdb handle
+ * buf the XML buffer to store retrieved data in
+ * @return
+ * If all went well TVDB_OK will be returned
+ */
 int tvdb_mirrors(htvdb_t htvdb, tvdb_buffer_t *buf);
+
+/*
+ * Get XML data, describing server time
+ * @arguments
+ * htvdb tvdb handle
+ * buf the XML buffer to store retrieved data in
+ * @return
+ * If all went well TVDB_OK will be returned
+ */
 int tvdb_time(htvdb_t htvdb, tvdb_buffer_t *buf);
+
+/*
+ * Search thetvdb for series 
+ * @arguments
+ * htvdb tvdb handle
+ * name The name or part of the name of de series
+ * language The preferred language the series can be in
+ * buf The XML buffer the retrieved data is written to
+ * @return
+ * If all went well TVDB_OK will be returned
+ */
 int tvdb_series(htvdb_t htvdb, const char *name, const char *language, tvdb_buffer_t *buf);
+
+/*
+ * Retieve series info (Episode and season data)
+ * @arguments
+ * htvdb tvdb handle
+ * series_id the series id from tvdb_series data
+ * lang The language the series is preffered to be in
+ * buf the XML buffer to store retrieved data in
+ * @return
+ * If all went well TVDB_OK will be returned
+ */
 int tvdb_series_info(htvdb_t htvdb, int series_id, const char *lang, tvdb_buffer_t *buf);
+
+/*
+ * Get banners of series from the filename field 
+ * @arguments
+ * htvdb tvdb handle
+ * filename filename from the XML data
+ * buf buffer storing retrieved image data
+ * @return
+ * If all went well TVDB_OK will be returned
+ */
 int tvdb_banners(htvdb_t htvdb, const char *filename, tvdb_buffer_t *buf);
+
+/*
+ * Post a rating vote to a series
+ * @arguments
+ * htvdb tvdb handle
+ * type the type of object to post a rating for (tvdb_type_series/tvdb_type_episode)
+ * item_id the id from the series or series_info to vote on
+ * rating the rating from 0 to 10
+ * buf The buffer containing the data
+ * @return
+ * If all went well TVDB_OK will be returned
+ */
 int tvdb_rate(htvdb_t htvdb, tvdb_item_type type, int item_id, int rating, tvdb_buffer_t *buf);
+
+/*
+ * Translate an error code to an error string
+ * @arguments
+ * err error code
+ * @return
+ * error string
+ */
 const char* tvdb_error_text(int err);
-void tvdb_free(void *);
 
 /* TVDB parser functions */
+
+/*
+ * Parse data from tvdb_mirrors function
+ * @arguments
+ * xml XML data from the tvdb_mirrors function
+ * url URL the data came from (can be left NULL)
+ * mirrors
+ * @return
+ */
 int tvdb_parse_mirrors(const tvdb_buffer_t *xml, const char *url, tvdb_list_front_t *mirrors);
+
+/*
+ * Parse data from tvdb_time function
+ * @arguments
+ * xml XML data from the tvdb_time function
+ * url URL the data came from (can be left NULL)
+ * server_time
+ * @return
+ */
 int tvdb_parse_time(const tvdb_buffer_t *xml, const char *url, tvdb_time_t *server_time);
+
+/*
+ * Parse data from tvdb_series function
+ * @arguments
+ * xml XML data from the tvdb_series function
+ * url URL the data came from (can be left NULL)
+ * series
+ * @return
+ */
 int tvdb_parse_series(const tvdb_buffer_t *xml, const char *url, tvdb_list_front_t *series);
-int tvdb_parse_series_info(const tvdb_buffer_t *xml, const char *url, tvdb_list_front_t *series);
+
+/*
+ * Parse data from tvdb_series_info function
+ * @arguments
+ * xml XML data from the tvdb_series_info function
+ * url URL the data came from (can be left NULL)
+ * series_info
+ * @return
+ */
+int tvdb_parse_series_info(const tvdb_buffer_t *xml, const char *url, tvdb_list_front_t *series_info);
+
+/*
+ * Parse data from the tvdb_rating function
+ * @arguments
+ * xml XML data from the tvdb_rating function
+ * url URL the data came from (can be left NULL)
+ * rating returned from the server
+ * @return
+ */
 int tvdb_parse_rating(const tvdb_buffer_t *xml, const char *url, float *rating);
 
 /* List manipulation functions */
-void tvdb_list_init(tvdb_list_front_t *p);
+
+/*
+ * Initialize the list
+ * @arguments
+ * front The list to initialize
+ */
+void tvdb_list_init(tvdb_list_front_t *front);
+
+/*
+ * Free all elements in the linked list
+ * When the front object is allocated it self it has to be freed separately
+ * @arguments
+ * front pointer to front object of list
+ */
 void tvdb_list_remove(tvdb_list_front_t *front);
+
+/*
+ * Get the number of elements in the list
+ * @arguments
+ * front pointer to front object of list
+ * @return
+ * Number of objects in the list
+ */
 unsigned int tvdb_list_size(tvdb_list_front_t *front);
+
+/*
+ * Get the first element in the list
+ * @arguments
+ * front pointer to front object of list
+ * @return
+ * Pointer to the first object, NULL when no objects are in the list.
+ */
 tvdb_list_node_t *tvdb_list_first(tvdb_list_front_t *front);
+
+/*
+ * Set the current object back to startingpoint (NULL)
+ * @arguments
+ * front pointer to front object of list
+ */
 void tvdb_list_reset(tvdb_list_front_t *front);
+
+/*
+ * Get the next item
+ * When the current pointer is NULL get the first object
+ * @arguments
+ * front pointer to front object of list
+ * @return
+ * Pointer to next object in database, NULL when on the end of the list
+ */
 tvdb_list_node_t *tvdb_list_next(tvdb_list_front_t *front);
+
+/*
+ * Get the previous item
+ * When the current pointer is NULL get the last object
+ * @arguments
+ * front pointer to front object of list
+ * @return
+ * Pointer to previous object in database, NULL when on the end of the list
+ */
 tvdb_list_node_t *tvdb_list_prev(tvdb_list_front_t *front);
 
 #endif /* TVDB_H_INCLUDED */

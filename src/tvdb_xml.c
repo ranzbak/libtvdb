@@ -194,7 +194,7 @@ TVDB_API int tvdb_parse_series(const tvdb_buffer_t *xml, const char *url, tvdb_l
    return result;
 }
 
-TVDB_API int tvdb_parse_series_info(const tvdb_buffer_t *xml, const char *url, tvdb_list_front_t *series)
+TVDB_API int tvdb_parse_series_info(const tvdb_buffer_t *xml, const char *url, tvdb_list_front_t *series_info)
 {
   xmlDoc *doc=NULL;
   xmlNode *node=NULL;
@@ -203,7 +203,7 @@ TVDB_API int tvdb_parse_series_info(const tvdb_buffer_t *xml, const char *url, t
   tvdb_series_info_t *s=NULL;
   int result = TVDB_E_PARSE_SERIES_XML;
 
-  if(xml == NULL || series == NULL) 
+  if(xml == NULL || series_info == NULL) 
   {
     return TVDB_E_PARSE_SERIES_INFO_XML;
   }
@@ -319,7 +319,7 @@ TVDB_API int tvdb_parse_series_info(const tvdb_buffer_t *xml, const char *url, t
             }
           }
         }
-        tvdb_list_add(series, s, sizeof(tvdb_series_info_t));
+        tvdb_list_add(series_info, s, sizeof(tvdb_series_info_t));
       }
     }
     result = TVDB_OK;

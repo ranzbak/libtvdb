@@ -33,9 +33,9 @@ TVDB_API tvdb_list_front_t *tvdb_list_add(tvdb_list_front_t *p, void *data, size
    return p;
 }
 
-TVDB_API void tvdb_list_init(tvdb_list_front_t *p)
+TVDB_API void tvdb_list_init(tvdb_list_front_t *front)
 {
-  memset(p, 0, sizeof(tvdb_list_front_t));
+  memset(front, 0, sizeof(tvdb_list_front_t));
 }
 
 TVDB_API void tvdb_list_remove(tvdb_list_front_t *front) 

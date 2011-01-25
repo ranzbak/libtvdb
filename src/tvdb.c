@@ -390,6 +390,3 @@ TVDB_API const char* tvdb_error_text(int err) {
    return "UNRECOGNISED ERROR CODE";
 }
 
-TVDB_API void tvdb_free(void *mem) {
-   free(mem);
-}
