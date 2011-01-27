@@ -20,6 +20,8 @@
 #define TVDB_STRING_SIZE 2048
 
 typedef long htvdb_t;
+typedef enum tvdb_item_type_e{tvdb_type_series, tvdb_type_episode, tvdb_type_time} tvdb_item_type;
+typedef char tvdb_time_t[16];
 
 /** Data structures 
  */
@@ -60,6 +62,12 @@ typedef struct tvdb_series_info {
   int   series_id;
 } tvdb_series_info_t;
 
+typedef struct tvdb_updates {
+  tvdb_item_type type;
+  tvdb_time_t time;
+  int   id;
+} tvdb_updates_t;
+
 typedef struct tvdb_buffer {
    char *memory;
    size_t size;
@@ -78,10 +86,6 @@ typedef struct tvdb_list_front {
    struct tvdb_list_node *current;
    unsigned int count;
 } tvdb_list_front_t;
-
-typedef char tvdb_time_t[16];
-
-typedef enum tvdb_item_type_e{tvdb_type_series, tvdb_type_episode}  tvdb_item_type;
 
 /* 
  * Initializes the XML download buffer.
@@ -134,6 +138,17 @@ int tvdb_mirrors(htvdb_t htvdb, tvdb_buffer_t *buf);
  * If all went well TVDB_OK will be returned
  */
 int tvdb_time(htvdb_t htvdb, tvdb_buffer_t *buf);
+
+/*
+ * Retrieve series and episodes updates
+ * @arguments
+ * htvdb tvdb handle
+ * time the server time of the last update
+ * buf The buffer the XML is stored into
+ * @return
+ * If all went well TVDB_OK will be returned
+ */
+int tvdb_updates(htvdb_t htvdb, tvdb_time_t *server_time, tvdb_buffer_t *buf);
 
 /*
  * Search thetvdb for series 
@@ -215,6 +230,17 @@ int tvdb_parse_mirrors(const tvdb_buffer_t *xml, const char *url, tvdb_list_fron
 int tvdb_parse_time(const tvdb_buffer_t *xml, const char *url, tvdb_time_t *server_time);
 
 /*
+ * Get the updates from the XML
+ * @arguments
+ * xml XML data from the tvdb_series_info function
+ * url URL the data came from (can be left NULL)
+ * server_time server time on the moment of this update
+ * updates list holding updates
+ * @return
+ */
+int tvdb_parse_updates(const tvdb_buffer_t *xml, const char *url, tvdb_list_front_t *updates);
+
+/*
  * Parse data from tvdb_series function
  * @arguments
  * xml XML data from the tvdb_series function
@@ -229,7 +255,7 @@ int tvdb_parse_series(const tvdb_buffer_t *xml, const char *url, tvdb_list_front
  * @arguments
  * xml XML data from the tvdb_series_info function
  * url URL the data came from (can be left NULL)
- * series_info
+ * series_info list holding series info
  * @return
  */
 int tvdb_parse_series_info(const tvdb_buffer_t *xml, const char *url, tvdb_list_front_t *series_info);

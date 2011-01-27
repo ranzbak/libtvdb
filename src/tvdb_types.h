@@ -59,6 +59,10 @@ typedef struct tvdb_series {
 } tvdb_series_t;
 #endif
 
+/** \brief Allocates a updates struct and zeros it
+ */
+tvdb_updates_t *tvdb_alloc_updates();
+
 /** \brief Allocates a series struct and zeros it
  */
 tvdb_series_t *tvdb_alloc_series();

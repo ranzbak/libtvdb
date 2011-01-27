@@ -9,6 +9,12 @@ tvdb_mirror_t *tvdb_alloc_mirror() {
    return mirror;
 }
 
+tvdb_updates_t *tvdb_alloc_updates() {
+   tvdb_updates_t *updates=NULL;
+   updates = (tvdb_updates_t *)calloc(1, sizeof(tvdb_updates_t));
+   return updates;
+}
+
 tvdb_series_t *tvdb_alloc_series() {
    tvdb_series_t *series=NULL;
    series = (tvdb_series_t *)calloc(1, sizeof(tvdb_series_t));

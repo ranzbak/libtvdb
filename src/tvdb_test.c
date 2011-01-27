@@ -46,20 +46,44 @@ void print_series(htvdb_t htvdb, tvdb_list_front_t *series) {
 }
 
 void print_series_info(tvdb_list_front_t *series_info) {
-   const tvdb_list_node_t *n=NULL;
-   tvdb_series_info_t *s=NULL;
+  const tvdb_list_node_t *n=NULL;
+  tvdb_series_info_t *s=NULL;
 
-   tvdb_list_reset(series_info);
+  tvdb_list_reset(series_info);
 
-   printf("\nSeries info:\n");
+  printf("\nSeries info:\n");
 
-   n = tvdb_list_next(series_info);
-   while(n != NULL) {
-     s = (tvdb_series_info_t *)n->data;
-     printf("\n id [%i], seriesid [%i], season [%i], episode [%i], name [%s], overview: %s\n", 
-         s->id, s->series_id, s->season_number, s->episode_number, s->episode_name, s->overview);
-     n = tvdb_list_next(series_info);
-   }
+  n = tvdb_list_next(series_info);
+  while(n != NULL) {
+    s = (tvdb_series_info_t *)n->data;
+    printf("\n id [%i], seriesid [%i], season [%i], episode [%i], name [%s], overview: %s\n", 
+        s->id, s->series_id, s->season_number, s->episode_number, s->episode_name, s->overview);
+    n = tvdb_list_next(series_info);
+  }
+}
+
+void print_updates(tvdb_list_front_t *updates) {
+  const tvdb_list_node_t *n=NULL;
+  tvdb_updates_t *s=NULL;
+
+  printf("\nUpdate info:\n");
+
+  tvdb_list_reset(updates);
+
+  n = tvdb_list_next(updates);
+  while(n != NULL) {
+    s = (tvdb_updates_t *)n->data;
+    if(s->type == tvdb_type_time) {
+      printf("The server time of the update %s\n", s->time);
+    }
+    else if(s->type == tvdb_type_series) {
+      printf("Update for series: %d\n", s->id);
+    }
+    else if(s->type == tvdb_type_episode) {
+      printf("Update for episodes: %d\n", s->id);
+    }
+    n = tvdb_list_next(updates);
+  }
 }
 
 int main(int argc, char *argv[]) {
@@ -84,6 +108,9 @@ int main(int argc, char *argv[]) {
   tvdb_list_front_t series_info;
   tvdb_buffer_t series_info_xml;
 
+  tvdb_list_front_t updates;
+  tvdb_buffer_t updates_xml;
+
   float rating=0.0;
   tvdb_buffer_t series_rating_xml;
 
@@ -94,6 +121,7 @@ int main(int argc, char *argv[]) {
   tvdb_list_init(&mirrors);
   tvdb_list_init(&series);
   tvdb_list_init(&series_info);
+  tvdb_list_init(&updates);
 
   /* Get mirrors XML from TVDB and parse it */
   tvdb_mirrors(tvdb, &mirrors_xml);
@@ -131,15 +159,23 @@ int main(int argc, char *argv[]) {
   rc = tvdb_rate(tvdb, tvdb_type_series, 1983237, 7, &series_rating_xml);
   if(rc == TVDB_OK) {
     tvdb_parse_rating(&series_rating_xml, NULL, &rating);
-    printf("XML:\n%s\n", series_rating_xml.memory);
     printf("Series rating after vote [%.2f].\n", rating);
     tvdb_free_buffer(&series_rating_xml);
+  }
+
+  /* Get updates and display them */
+  rc = tvdb_updates(tvdb, "1296075259", &updates_xml);
+  if(rc == TVDB_OK) {
+    printf("Update XML.\n%s", updates_xml.memory);
+    tvdb_parse_updates(&updates_xml, NULL, &updates);
+    print_updates(&updates);
   }
 
   /* Clean up */
   tvdb_list_remove(&mirrors);
   tvdb_list_remove(&series);
   tvdb_list_remove(&series_info);
+  tvdb_list_remove(&updates);
   tvdb_uninit(tvdb);
 
   return 0;

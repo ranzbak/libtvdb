@@ -226,6 +226,52 @@ TVDB_API int tvdb_time(htvdb_t htvdb, tvdb_buffer_t *buf) {
    return TVDB_OK;
 }
 
+/*
+ * Retrieve series and episodes updates
+ * @arguments
+ * htvdb tvdb handle
+ * time the server time of the last update
+ * buf The buffer the XML is stored into
+ * @return
+ * If all went well TVDB_OK will be returned
+ */
+int tvdb_updates(htvdb_t htvdb, tvdb_time_t *server_time, tvdb_buffer_t *buf)
+{
+   tvdb_context_t *tvdb=NULL;
+   URL url;
+   CURLcode cc;
+
+   /* 
+    * Sanity checks
+    */
+   if (htvdb <= 0)
+      return TVDB_E_INVALID_HANDLE;
+   tvdb = (tvdb_context_t *)htvdb;
+
+   /*
+    * Initialize the buffer
+    */
+   tvdb_init_buffer(buf);
+
+   snprintf(url, URL_SIZE, "http://www.thetvdb.com/api/Updates.php?type=all&time=%s", *server_time);
+
+   if ((cc = get_XML(tvdb->curl, url, buf)) != CURLE_OK)
+      return TVDB_E_CURL;
+
+   return TVDB_OK;
+}
+
+/*
+ * Retrieve series and episodes updates
+ * @arguments
+ * htvdb tvdb handle
+ * time the server time of the last update
+ * buf The buffer the XML is stored into
+ * @return
+ * If all went well TVDB_OK will be returned
+ */
+int tvdb_updates(htvdb_t htvdb, tvdb_time_t *server_time, tvdb_buffer_t *buf);
+
 TVDB_API int tvdb_series(htvdb_t htvdb, const char *name, const char *language, tvdb_buffer_t *buf) {
    tvdb_context_t *tvdb=NULL;
    URL url;
@@ -325,6 +371,9 @@ static char *tvdb_get_item_type(tvdb_item_type type)
       break;
     case tvdb_type_episode:
       itemtype="episode";
+      break;
+    case tvdb_type_time:
+      itemtype="time";
       break;
   }
 

@@ -99,37 +99,104 @@ TVDB_API int tvdb_parse_time(const tvdb_buffer_t *xml, const char *url, tvdb_tim
    return result;
 }
 
+/*
+ * Get the updates from the XML
+ * @arguments
+ * xml XML data from the tvdb_series_info function
+ * url URL the data came from (can be left NULL)
+ * server_time server time on the moment of this update
+ * updates list holding updates
+ * @return
+ */
+TVDB_API int tvdb_parse_updates(const tvdb_buffer_t *xml, const char *url, tvdb_list_front_t *updates)
+{
+  xmlDoc *doc=NULL;
+  xmlNode *node=NULL;
+  xmlNode *elem=NULL;
+  char *tmp=NULL;
+  tvdb_updates_t *s=NULL;
+  int len=0;
+
+  int result = TVDB_E_PARSE_SERIES_XML;
+
+  if(xml == NULL || updates == NULL) 
+  {
+    return TVDB_E_PARSE_SERIES_XML;
+  }
+
+  doc = xmlReadMemory(xml->memory, xml->size, url, 0, 0);
+  node = xmlDocGetRootElement(doc);
+
+  if (node != NULL && node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar *)"Items")) {
+    /* iterate Series nodes */
+    for (elem = node->children; elem; elem = elem->next) {
+      if (elem->type == XML_ELEMENT_NODE) {
+        s = tvdb_alloc_updates();
+        if (!xmlStrcmp(elem->name, (const xmlChar *)"Time")) {
+          if ((tmp = (char*) xmlNodeGetContent(elem))) {
+            s->type = tvdb_type_time;
+            len = xmlStrlen(BAD_CAST tmp);
+            memcpy(s->time, tmp, len);
+            (s->time)[len] = 0;
+            xmlFree(tmp);
+            /* When we found the time things are okay */
+            result = TVDB_OK;
+          }
+        }
+        if (!xmlStrcmp(elem->name, (const xmlChar *)"Series")) {
+          if ((tmp = (char*) xmlNodeGetContent(elem))) {
+            s->type = tvdb_type_series;
+            s->id = atoi(tmp);
+            xmlFree(tmp);
+          }
+        }
+        if (!xmlStrcmp(elem->name, (const xmlChar *)"Episode")) {
+          if ((tmp = (char*) xmlNodeGetContent(elem))) {
+            s->type = tvdb_type_episode;
+            s->id = atoi(tmp);
+            xmlFree(tmp);
+          }
+        }
+        tvdb_list_add(updates, s, sizeof(tvdb_updates_t));
+      }
+    }
+  }
+
+  xmlFreeDoc(doc);
+
+  return result;
+}
+
 TVDB_API int tvdb_parse_series(const tvdb_buffer_t *xml, const char *url, tvdb_list_front_t *series) {
-   xmlDoc *doc=NULL;
-   xmlNode *node=NULL;
-   xmlNode *elem=NULL;
-   char *tmp=NULL;
-   tvdb_series_t *s=NULL;
-   int result = TVDB_E_PARSE_SERIES_XML;
+  xmlDoc *doc=NULL;
+  xmlNode *node=NULL;
+  xmlNode *elem=NULL;
+  char *tmp=NULL;
+  tvdb_series_t *s=NULL;
+  int result = TVDB_E_PARSE_SERIES_XML;
 
+  if(xml == NULL || series == NULL) 
+  {
+    return TVDB_E_PARSE_SERIES_XML;
+  }
 
-   if(xml == NULL || series == NULL) 
-   {
-     return TVDB_E_PARSE_SERIES_XML;
-   }
+  doc = xmlReadMemory(xml->memory, xml->size, url, 0, 0);
+  node = xmlDocGetRootElement(doc);
 
-   doc = xmlReadMemory(xml->memory, xml->size, url, 0, 0);
-   node = xmlDocGetRootElement(doc);
+  if (node != NULL && node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar *)"Data")) {
+    /* iterate Series nodes */
+    for (node = node->children; node; node = node->next) {
+      if (node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar *)"Series")) {
+        s = tvdb_alloc_series();
 
-   if (node != NULL && node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar *)"Data")) {
-      /* iterate Series nodes */
-      for (node = node->children; node; node = node->next) {
-         if (node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar *)"Series")) {
-            s = tvdb_alloc_series();
-
-            /* iterate child elements of each Series node */
-            for (elem = node->children; elem; elem = elem->next) {
-               if (elem->type == XML_ELEMENT_NODE) {
-                  if (!xmlStrcmp(elem->name, (const xmlChar *)"id")) {
-                     if ((tmp = (char*) xmlNodeGetContent(elem))) {
-                        s->id = atoi(tmp);
-                        xmlFree(tmp);
-                     }
+        /* iterate child elements of each Series node */
+        for (elem = node->children; elem; elem = elem->next) {
+          if (elem->type == XML_ELEMENT_NODE) {
+            if (!xmlStrcmp(elem->name, (const xmlChar *)"id")) {
+              if ((tmp = (char*) xmlNodeGetContent(elem))) {
+                s->id = atoi(tmp);
+                xmlFree(tmp);
+              }
                   }
                   else if (!xmlStrcmp(elem->name, (const xmlChar *)"seriesid")) {
                      if ((tmp = (char*) xmlNodeGetContent(elem))) {
