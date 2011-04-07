@@ -12,7 +12,7 @@ building a DLL on windows.
 #ifdef LIBTVDB_STATIC
    #define TVDB_API
 #else
-   #if defined (_WIN32) 
+   #if defined (_WIN32) && !defined (__MINGW__)
      #if defined(libtvdb_EXPORTS)
        #define  TVDB_API __declspec(dllexport)
      #else
