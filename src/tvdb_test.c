@@ -39,7 +39,7 @@ void print_series(htvdb_t htvdb, tvdb_list_front_t *series) {
       printf("\n  id [%i], seriesid [%i], name [%s], overview: %s\n", s->id, s->series_id, s->name, s->overview);
       // Get image banner, and as 'proof' we got it, diplay filesize.
       rc = tvdb_banners(htvdb, s->banner, &buf);
-      printf("Banner file size: %ld\n", buf.size);
+      printf("Banner file size: %lu\n", (unsigned long) buf.size);
       tvdb_free_buffer(&buf);
       n = tvdb_list_next(series);
    }
@@ -113,6 +113,7 @@ int main(int argc, char *argv[]) {
 
   float rating=0.0;
   tvdb_buffer_t series_rating_xml;
+  char faketime[16]="1296075259";
 
   /* Init libtvdb and get a handle */
   htvdb_t tvdb = tvdb_init(MY_API_KEY);
@@ -164,7 +165,7 @@ int main(int argc, char *argv[]) {
   }
 
   /* Get updates and display them */
-  rc = tvdb_updates(tvdb, "1296075259", &updates_xml);
+  rc = tvdb_updates(tvdb, &faketime, &updates_xml);
   if(rc == TVDB_OK) {
     printf("Update XML.\n%s", updates_xml.memory);
     tvdb_parse_updates(&updates_xml, NULL, &updates);

@@ -45,6 +45,13 @@ add_executable(tvdb_test tvdb_test.c)
 add_dependencies(tvdb_test tvdb)
 add_definitions(-Wall -g)
 
+# Set the build version (VERSION) and the API version (SOVERSION)
+SET_TARGET_PROPERTIES(tvdb
+  PROPERTIES
+  VERSION 0.1.0
+  SOVERSION 1)
+
+
 if (MSVC)
    set_target_properties(tvdb PROPERTIES LINK_FLAGS "/MAP")
 endif(MSVC)

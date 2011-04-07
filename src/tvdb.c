@@ -146,6 +146,9 @@ CURLcode get_XML(CURL *curl, const char *url, tvdb_buffer_t *buf) {
    if ((cc = curl_easy_setopt(curl, CURLOPT_WRITEDATA, buf)) != CURLE_OK)
       return cc;
 
+   if ((cc = curl_easy_setopt( curl, CURLOPT_FOLLOWLOCATION, 1)) != CURLE_OK)
+      return cc;
+
    if ((cc = curl_easy_setopt(curl, CURLOPT_USERAGENT, "libtvdb-agent/1.0")) != CURLE_OK)
       return cc;
 
