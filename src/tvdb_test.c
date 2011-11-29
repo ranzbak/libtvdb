@@ -26,7 +26,7 @@ void print_series(htvdb_t htvdb, tvdb_list_front_t *series) {
    const tvdb_list_node_t *n=NULL;
    tvdb_series_t *s=NULL;
    tvdb_buffer_t buf;
-   int rc=0;
+   //int rc=0;
 
    tvdb_init_buffer(&buf);
    tvdb_list_reset(series);
@@ -38,7 +38,8 @@ void print_series(htvdb_t htvdb, tvdb_list_front_t *series) {
       s = (tvdb_series_t *)n->data;
       printf("\n  id [%i], seriesid [%i], name [%s], overview: %s\n", s->id, s->series_id, s->name, s->overview);
       // Get image banner, and as 'proof' we got it, diplay filesize.
-      rc = tvdb_banners(htvdb, s->banner, &buf);
+      //rc = tvdb_banners(htvdb, s->banner, &buf);
+      tvdb_banners(htvdb, s->banner, &buf);
       printf("Banner file size: %lu\n", (unsigned long) buf.size);
       tvdb_free_buffer(&buf);
       n = tvdb_list_next(series);
